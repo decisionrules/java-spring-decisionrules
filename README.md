@@ -60,12 +60,13 @@ final List<ExampleRuleOutput> output = restTemplate.postForObject(formatUrl(conn
 ````
 
 ## Troubleshooting
-You can encounter certificate validation problem
 
+### Certificate problem
+You can encounter certificate validation problem
 PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target
 javax.net.ssl.SSLHandshakeException: PKIX path building failed
 
-Problem is caused by missing root certificate in standard OpenJDK keystore. 
+Problem is caused by missing root Let's encrypt certificate in standard OpenJDK keystore. 
 You need to download the root certificate from api.decisiongrid.io web and install it into keystore with following command:
 
 ````bash
