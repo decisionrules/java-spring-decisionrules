@@ -12,9 +12,6 @@ git clone
 ````
 
 Add your sample rule id (every account on decision grid has this sample rule by default) and bearer token to Main class. 
-````java
-
-````
 
 
 Execute main method in Main class and see the result
