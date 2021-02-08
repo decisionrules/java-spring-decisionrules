@@ -8,7 +8,7 @@ This simple project shows how can you call decision grid api mainly
 ## How to execute this example
 1. Clone this repo to your computer
 ````bash
-git clone 
+git clone https://github.com/decisiongrid/java-spring-decisiongrid.git
 ````
 2. Add your sample rule id (every account on decision grid has this sample rule by default) and bearer token to Main class. 
 
