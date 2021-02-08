@@ -1,9 +1,29 @@
 # spring-rest-template-decisiongrid-example
 Example call to decision grid api using spring rest template.
+This simple project shows how can you call decision grid api mainly
+- init rest template
+- add authorization headers
+- execute sample rule on decisiongrid 
+
+## How to execute this example
+Clone this repo to your computer
+````bash
+git clone 
+````
+
+Add your sample rule id (every account on decision grid has this sample rule by default) and bearer token to Main class. 
+````java
+
+````
+
+
+Execute main method in Main class and see the result
 
 ## Decision grid call example
 
 ### prepare header with token authorization
+Every call to decision grid has to containg authorization header with bearer token.
+
 ````java
 HttpHeaders headers = new HttpHeaders();
 headers.setContentType(MediaType.APPLICATION_JSON);
@@ -11,6 +31,7 @@ headers.set("Authorization", "Bearer " + bearerToken);
 ````
 
 ### call api with json in string 
+
 ````java
 //prepare input object
 String jsonInput = "{\"delivery\":{\"distance\":40,\"tariff\":\"basic\"},\"pack\":{\"weight\":4,\"longestSide\":50}}";
