@@ -68,7 +68,7 @@ javax.net.ssl.SSLHandshakeException: PKIX path building failed
 Problem is caused by missing root certificate in standard OpenJDK keystore. 
 You need to download the root certificate from api.decisiongrid.io web and install it into keystore with following command:
 
-````shell
+````bash
 keytool -import -trustcacerts -file /path/to/cert.cer -alias somealiasforcert -keystore $JAVA_HOME/jre/lib/security/jssecacerts -storepass changeit
 ````
 
