@@ -25,7 +25,7 @@ headers.setContentType(MediaType.APPLICATION_JSON);
 headers.set("Authorization", "Bearer " + bearerToken);
 ````
 
-### call api with json in string 
+### Call REST api with json in string 
 
 ````java
 //prepare input object
@@ -37,7 +37,7 @@ ResponseEntity<String> response = restTemplate.exchange(formatUrl(connectionUrl,
         
 ````
 
-### call api with java model
+### Call REST api with java model
 
 ````java
 // register object mapper to rest template
