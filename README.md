@@ -1,4 +1,4 @@
-# Java Spring Example
+# Java Spring Decisiongrid Example
 Example call to decision grid api using spring rest template.
 This simple project shows how can you call decision grid api mainly
 - init rest template
