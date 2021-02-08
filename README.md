@@ -70,4 +70,5 @@ You need to download the root certificate from api.decisiongrid.io web and insta
 ``shell
 keytool -import -trustcacerts -file /path/to/cert.cer -alias somealiasforcert -keystore $JAVA_HOME/jre/lib/security/jssecacerts -storepass changeit
 ``
+
 If for some reason you don't want to add root certificate, adding intermediate certificate should do the trick as well.
