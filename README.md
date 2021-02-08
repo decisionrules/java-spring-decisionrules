@@ -6,15 +6,13 @@ This simple project shows how can you call decision grid api mainly
 - execute sample rule on decisiongrid 
 
 ## How to execute this example
-Clone this repo to your computer
+1. Clone this repo to your computer
 ````bash
 git clone 
 ````
+2. Add your sample rule id (every account on decision grid has this sample rule by default) and bearer token to Main class. 
 
-Add your sample rule id (every account on decision grid has this sample rule by default) and bearer token to Main class. 
-
-
-Execute main method in Main class and see the result
+3. Execute main method in Main class and see the result
 
 ## Decision grid call example
 
