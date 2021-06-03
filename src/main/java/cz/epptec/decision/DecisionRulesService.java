@@ -15,12 +15,10 @@ import java.util.List;
 
 public class DecisionRulesService {
 
-    private String connectionUrl;
     private RestTemplate restTemplate;
     private HttpHeaders headers;
 
-    public DecisionRulesService(final String connectionUrl, final String bearerToken) {
-        this.connectionUrl = connectionUrl;
+    public DecisionRulesService(final String bearerToken) { 
         this.restTemplate = new RestTemplate();
         this.restTemplate.getMessageConverters().add(createConverter());
         this.headers = createHttpHeaders(bearerToken);
@@ -28,13 +26,13 @@ public class DecisionRulesService {
 
     public String solveRule(final String ruleId, final String version, final String paramsAsJsonInString) {
         HttpEntity<String> entity = new HttpEntity<String>(paramsAsJsonInString, headers);
-        ResponseEntity<String> response = restTemplate.exchange(formatUrl(connectionUrl, ruleId, version), HttpMethod.POST, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(formatUrl(ruleId, geoloc, version), HttpMethod.POST, entity, String.class);
         return response.getBody();
     }
 
     public List<ExampleRuleOutput> solveRuleWithModel(final String ruleId, final String version, final ExampleRuleInput input) {
         HttpEntity<ExampleRuleInput> entity = new HttpEntity<ExampleRuleInput>(input, headers);
-        final List<ExampleRuleOutput> output = restTemplate.postForObject(formatUrl(connectionUrl, ruleId, version), entity, List.class);
+        final List<ExampleRuleOutput> output = restTemplate.postForObject(formatUrl(ruleId, geoloc, version), entity, List.class);
         return output;
     }
 
@@ -47,8 +45,9 @@ public class DecisionRulesService {
         return headers;
     }
 
-    private String formatUrl(final String baseUrl, final String ruleId, final String versionId) {
-        return baseUrl + "/" + ruleId + "/" + versionId;
+    private String formatUrl(final String ruleId, final String geoloc, final String versionId) {
+        String baseUrl = ".app.decisionrules.io";
+        return "http://" + geoloc + baseUrl + "/" + ruleId + "/" + versionId;
     }
 
     private MappingJackson2HttpMessageConverter createConverter() {
