@@ -1,47 +1,37 @@
 package cz.epptec.decision;
 
-import cz.epptec.decision.model.ExampleRuleInput;
-import cz.epptec.decision.model.ExampleRuleOutput;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
-import java.util.List;
+import cz.epptec.decision.DecisionRulesEnums.RuleStatus;
+import cz.epptec.decision.model.Rule;
 
 public class Main {
+        public static void main(String[] args) throws Exception {
+                ObjectMapper mapper = new ObjectMapper();
+                mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
+                String host = "https://test.api.decisionrules.io";
+                String solverKey = "ObZQp40R6-M2hBK8O6Qm0757X7T4XLlE2A5VXpbQde_MiWLP0t7iFmZe__mUZLR0";
+                String managementKey = "cQJWhZUpyylFrde5OTO5IxGfN8klJZVrai0u5k63iNvEacZjq6BQq4vKlje839u9";
 
-    public static void main(String[] args) {
+                // init service
+                DecisionRulesService dr = new DecisionRulesService(
+                                new DecisionRulesOptions(host, solverKey, managementKey));
 
-        String ruleId = "***YOUR DESIRED RULE ID HERE***";
-        String versionId = "1";
-        String baseUrl = "https://api.decisionrules.io/rule/solve";
-        String bearerToken = "***YOUR TOKEN BEARER HERE***";
+                Rule rule = dr.management.getRule("16fbb1b7-5942-6637-15f5-5663c43601d5");
 
-        //init service
-        DecisionRulesService service = new DecisionRulesService(baseUrl,bearerToken);
+                rule.setBaseId(null);
+                rule.setRuleId(null);
+                rule.setSessionId(null);
+                rule.setCompositionId(null);
+                rule.setPreviousBaseId(null);
+                rule.setRuleAlias(null);
+                rule.setName("Created from SDK");
 
-        //call api using string containing json, response is also json in string
-        String jsonIntput = "***YOUR JSON STRING INPUT HERE***";
-        String jsonResult = service.solveRule(ruleId, versionId,jsonIntput);
-        System.out.println("Result of simple call with json string:");
-        System.out.println(jsonResult);
-
-        //call api using java model
-        ExampleRuleInput inputModel = createTestInput();
-        List<ExampleRuleOutput> outputModel = service.solveRuleWithModel(ruleId, versionId,inputModel);
-        System.out.println("Result of call with java model:");
-        System.out.println(outputModel);
-
-    }
-
-    private static ExampleRuleInput createTestInput() {
-        ExampleRuleInput input = new ExampleRuleInput();
-        ExampleRuleInput.Delivery delivery = new ExampleRuleInput.Delivery();
-        delivery.setDistance(40);
-        delivery.setTariff("basic");
-        input.setDelivery(delivery);
-        ExampleRuleInput.Pack pack = new ExampleRuleInput.Pack();
-        pack.setLongestSide(50);
-        pack.setWeight(4);
-        input.setPack(pack);
-        return input;
-    }
+                System.out.println(mapper
+                                .writeValueAsString(dr.management.createRule(rule)));
+                System.out.println(mapper
+                                .writeValueAsString(dr.management.createRule(rule, "/New Folder")));
+        }
 }
