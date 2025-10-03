@@ -1,7 +1,10 @@
-package cz.epptec.decision.model;
+package decisionrules.model;
 
-import cz.epptec.decision.DecisionRulesEnums.FolderType;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+import decisionrules.DecisionRulesEnums.FolderType;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class FolderNode {
     public String id;
     public FolderType type;

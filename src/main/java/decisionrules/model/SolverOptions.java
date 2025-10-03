@@ -1,4 +1,4 @@
-package cz.epptec.decision.model;
+package decisionrules.model;
 
 public class SolverOptions {
     public Boolean debug;

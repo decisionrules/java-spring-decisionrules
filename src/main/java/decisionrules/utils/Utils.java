@@ -1,4 +1,4 @@
-package cz.epptec.decision.utils;
+package decisionrules.utils;
 
 import java.net.URI;
 import java.util.Arrays;
@@ -13,10 +13,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import cz.epptec.decision.DecisionRulesOptions;
-import cz.epptec.decision.DecisionRulesEnums.HostEnum;
-import cz.epptec.decision.exceptions.DecisionRulesErrorException;
-import cz.epptec.decision.model.SolverOptions;
+import decisionrules.DecisionRulesEnums.HostEnum;
+import decisionrules.exceptions.DecisionRulesErrorException;
 
 public class Utils {
     static ObjectMapper mapper = new ObjectMapper();
@@ -63,7 +61,7 @@ public class Utils {
     }
 
     public static DecisionRulesErrorException handleError(Exception e) {
-        if (!e.getMessage().isEmpty()) {
+        if (e.getMessage() != null && !e.getMessage().isEmpty()) {
             throw new DecisionRulesErrorException(e.getMessage(), Arrays.stream(e.getStackTrace())
                     .map(StackTraceElement::toString).reduce("", (a, b) -> a + "\n" + b));
         }

@@ -1,10 +1,7 @@
-package cz.epptec.decision.api;
+package decisionrules.api;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-
-import static cz.epptec.decision.utils.Utils.getBaseURL;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Map;
@@ -16,24 +13,31 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ser.impl.StringArraySerializer;
 
-import cz.epptec.decision.DecisionRulesEnums.MngCategoryEnum;
-import cz.epptec.decision.DecisionRulesEnums.RuleStatus;
-import cz.epptec.decision.DecisionRulesOptions;
-import cz.epptec.decision.model.FolderNode;
-import cz.epptec.decision.model.FolderOptions;
-import cz.epptec.decision.model.Rule;
-import cz.epptec.decision.model.RuleOptions;
-import cz.epptec.decision.utils.Utils;
+import decisionrules.DecisionRulesEnums.MngCategoryEnum;
+import decisionrules.DecisionRulesEnums.RuleStatus;
+import decisionrules.DecisionRulesOptions;
+import decisionrules.model.Dependencies;
+import decisionrules.model.Duplicates;
+import decisionrules.model.FindOptions;
+import decisionrules.model.FolderData;
+import decisionrules.model.FolderExport;
+import decisionrules.model.FolderImport;
+import decisionrules.model.FolderNode;
+import decisionrules.model.FolderOptions;
+import decisionrules.model.Rule;
+import decisionrules.model.RuleOptions;
+import decisionrules.utils.Utils;
+import static decisionrules.utils.Utils.getBaseURL;
 
 public class ManagementApi {
 
     private final RestTemplate restTemplate;
-    ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper;
 
-    public ManagementApi(RestTemplate restTemplate) {
+    public ManagementApi(RestTemplate restTemplate, ObjectMapper mapper) {
         this.restTemplate = restTemplate;
+        this.mapper = mapper;
     }
 
     public URI getCategoryUrl(String host, MngCategoryEnum category,
@@ -85,14 +89,15 @@ public class ManagementApi {
         try {
             String baseUrl = getBaseURL(host);
             String path = String.format("/api/%s/%s", category.value, String.join("/",
-                    Arrays.stream(apiPath).filter(pathParam -> !pathParam.isEmpty()).toArray(String[]::new)));
+                    Arrays.stream(apiPath).filter(pathParam -> pathParam != null && !pathParam.isEmpty())
+                            .toArray(String[]::new)));
             return URI.create(baseUrl + path);
         } catch (Exception e) {
             throw new Exception(e);
         }
     }
 
-    public Rule getRuleAPI(DecisionRulesOptions options, String ruleIdOrAlias, Number version, RuleOptions ruleOptions)
+    public Rule getRuleAPI(DecisionRulesOptions options, String ruleIdOrAlias, Integer version, RuleOptions ruleOptions)
             throws Exception {
         try {
             String versionString = getRuleVersion(version, ruleOptions);
@@ -107,12 +112,13 @@ public class ManagementApi {
     }
 
     public Rule updateRuleStatusAPI(DecisionRulesOptions options, String ruleIdOrAlias, RuleStatus status,
-            Number version) throws Exception {
+            Integer version) throws Exception {
         try {
+            String versionString = getRuleVersion(version, null);
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
             URI url = getCategoryUrl(options.host, MngCategoryEnum.RULE,
                     new String[] { "status", ruleIdOrAlias, status.value,
-                            (version == null) ? "" : version.toString() });
+                            versionString });
             System.err.println("URL: " + url);
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.PUT);
             return mapper.readValue(response, Rule.class);
@@ -121,12 +127,14 @@ public class ManagementApi {
         }
     }
 
-    public Rule updateRuleAPI(DecisionRulesOptions options, String ruleIdOrAlias, Rule data, Number version)
+    public Rule updateRuleAPI(DecisionRulesOptions options, String ruleIdOrAlias, Rule data, Integer version)
             throws Exception {
         try {
+            String versionString = getRuleVersion(version, null);
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
             URI url = getCategoryUrl(options.host, MngCategoryEnum.RULE,
-                    new String[] { ruleIdOrAlias, (version == null) ? "" : version.toString() });
+                    new String[] { ruleIdOrAlias, versionString });
+            System.err.println("URL: " + url);
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.PUT, data);
             return mapper.readValue(response, Rule.class);
         } catch (Exception e) {
@@ -146,7 +154,7 @@ public class ManagementApi {
         }
     }
 
-    public Rule createNewRuleVersionAPI(DecisionRulesOptions options, String ruleIdOrAlias, Object data)
+    public Rule createNewRuleVersionAPI(DecisionRulesOptions options, String ruleIdOrAlias, Rule data)
             throws Exception {
         try {
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
@@ -158,12 +166,13 @@ public class ManagementApi {
         }
     }
 
-    public String deleteRuleAPI(DecisionRulesOptions options, String ruleIdOrAlias, Number version,
+    public String deleteRuleAPI(DecisionRulesOptions options, String ruleIdOrAlias, Integer version,
             RuleOptions ruleOptions) throws Exception {
         try {
+            String versionString = getRuleVersion(version, null);
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
             URI url = getCategoryUrl(options.host, MngCategoryEnum.RULE,
-                    new String[] { ruleIdOrAlias, (version == null) ? "" : version.toString() },
+                    new String[] { ruleIdOrAlias, versionString },
                     createDataMap(ruleOptions));
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.DELETE);
             return response;
@@ -172,13 +181,14 @@ public class ManagementApi {
         }
     }
 
-    public String lockRuleAPI(DecisionRulesOptions options, String ruleIdOrAlias, Boolean locked, Number version,
+    public String lockRuleAPI(DecisionRulesOptions options, String ruleIdOrAlias, Boolean locked, Integer version,
             RuleOptions ruleOptions) throws Exception {
         try {
             String versionString = getRuleVersion(version, ruleOptions);
+            System.err.println("Version string: " + versionString);
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
             URI url = getCategoryUrl(options.host, MngCategoryEnum.RULE,
-                    new String[] { "lock", ruleIdOrAlias, versionString }, mapper.convertValue(ruleOptions, Map.class));
+                    new String[] { "lock", ruleIdOrAlias, versionString }, createDataMap(ruleOptions));
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.PATCH, Map.of("locked", locked));
             return response;
         } catch (Exception e) {
@@ -186,7 +196,7 @@ public class ManagementApi {
         }
     }
 
-    public String findDuplicatesAPI(DecisionRulesOptions options, String ruleIdOrAlias, Number version)
+    public Duplicates findDuplicatesAPI(DecisionRulesOptions options, String ruleIdOrAlias, Integer version)
             throws Exception {
         try {
             String versionString = getRuleVersion(version, null);
@@ -194,13 +204,13 @@ public class ManagementApi {
             URI url = getCategoryUrl(options.host, MngCategoryEnum.TOOLS,
                     new String[] { "duplicates", ruleIdOrAlias, versionString });
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.GET);
-            return response;
+            return mapper.readValue(response, Duplicates.class);
         } catch (Exception e) {
             throw e;
         }
     }
 
-    public String findDependenciesAPI(DecisionRulesOptions options, String ruleIdOrAlias, Number version)
+    public Dependencies findDependenciesAPI(DecisionRulesOptions options, String ruleIdOrAlias, Integer version)
             throws Exception {
         try {
             String versionString = getRuleVersion(version, null);
@@ -208,54 +218,54 @@ public class ManagementApi {
             URI url = getCategoryUrl(options.host, MngCategoryEnum.TOOLS,
                     new String[] { "dependencies", ruleIdOrAlias, versionString });
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.GET);
-            return response;
+            return mapper.readValue(response, Dependencies.class);
         } catch (Exception e) {
             throw e;
         }
     }
 
-    public String getRulesForSpaceAPI(DecisionRulesOptions options)
+    public Rule[] getRulesForSpaceAPI(DecisionRulesOptions options)
             throws Exception {
         try {
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
             URI url = getCategoryUrl(options.host, MngCategoryEnum.SPACE, new String[] { "items" });
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.GET);
-            return response;
+            return mapper.readValue(response, Rule[].class);
         } catch (Exception e) {
             throw e;
         }
     }
 
-    public String getRulesByTagsAPI(DecisionRulesOptions options, String[] tags) throws Exception {
+    public Rule[] getRulesByTagsAPI(DecisionRulesOptions options, String[] tags) throws Exception {
         try {
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
             URI url = getCategoryUrl(options.host, MngCategoryEnum.TAGS, new String[] { "items" }, tags);
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.GET);
-            return response;
+            return mapper.readValue(response, Rule[].class);
         } catch (Exception e) {
             throw e;
         }
     }
 
-    public String addTagsAPI(DecisionRulesOptions options, String ruleIdOrAlias, String[] tags, Number version)
+    public String[] addTagsAPI(DecisionRulesOptions options, String ruleIdOrAlias, String[] tags, Integer version)
             throws Exception {
         try {
             String versionString = getRuleVersion(version, null);
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
-            URI url = getCategoryUrl(options.host, MngCategoryEnum.RULE, new String[] { ruleIdOrAlias, versionString });
+            URI url = getCategoryUrl(options.host, MngCategoryEnum.TAGS, new String[] { ruleIdOrAlias, versionString });
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.PATCH, tags);
-            return response;
+            return mapper.readValue(response, String[].class);
         } catch (Exception e) {
             throw e;
         }
     }
 
-    public String deleteTagsAPI(DecisionRulesOptions options, String ruleIdOrAlias, String[] tags, Number version)
+    public String deleteTagsAPI(DecisionRulesOptions options, String ruleIdOrAlias, String[] tags, Integer version)
             throws Exception {
         try {
             String versionString = getRuleVersion(version, null);
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
-            URI url = getCategoryUrl(options.host, MngCategoryEnum.RULE, new String[] { ruleIdOrAlias, versionString },
+            URI url = getCategoryUrl(options.host, MngCategoryEnum.TAGS, new String[] { ruleIdOrAlias, versionString },
                     tags);
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.DELETE);
             return response;
@@ -264,12 +274,12 @@ public class ManagementApi {
         }
     }
 
-    public String createFolderAPI(DecisionRulesOptions options, String targetNodeId, Object data,
+    public String createFolderAPI(DecisionRulesOptions options, String targetNodeId, FolderData data,
             FolderOptions folderOptions) throws Exception {
         try {
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
-            URI url = getCategoryUrl(options.host, MngCategoryEnum.RULE, new String[] { targetNodeId },
-                    mapper.convertValue(folderOptions, Map.class));
+            URI url = getCategoryUrl(options.host, MngCategoryEnum.FOLDER, new String[] { targetNodeId },
+                    createDataMap(folderOptions));
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.POST, data);
             return response;
         } catch (Exception e) {
@@ -277,55 +287,55 @@ public class ManagementApi {
         }
     }
 
-    public String updateNodeFolderStructureAPI(DecisionRulesOptions options, String targetNodeId, Object data,
+    public FolderData updateNodeFolderStructureAPI(DecisionRulesOptions options, String targetNodeId, FolderData data,
             FolderOptions folderOptions)
             throws Exception {
         try {
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
-            URI url = getCategoryUrl(options.host, MngCategoryEnum.RULE, new String[] { targetNodeId },
-                    mapper.convertValue(folderOptions, Map.class));
+            URI url = getCategoryUrl(options.host, MngCategoryEnum.FOLDER, new String[] { targetNodeId },
+                    createDataMap(folderOptions));
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.PUT, data);
-            return response;
+            return mapper.readValue(response, FolderData.class);
         } catch (Exception e) {
             throw e;
         }
     }
 
-    public String exportFolderAPI(DecisionRulesOptions options, String targetNodeId, FolderOptions folderOptions)
+    public FolderExport exportFolderAPI(DecisionRulesOptions options, String targetNodeId, FolderOptions folderOptions)
             throws Exception {
         try {
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
-            URI url = getCategoryUrl(options.host, MngCategoryEnum.RULE, new String[] { "export", targetNodeId },
-                    mapper.convertValue(folderOptions, Map.class));
+            URI url = getCategoryUrl(options.host, MngCategoryEnum.FOLDER, new String[] { "export", targetNodeId },
+                    createDataMap(folderOptions));
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.GET);
-            return response;
+            return mapper.readValue(response, FolderExport.class);
         } catch (Exception e) {
             throw e;
         }
     }
 
-    public String importFolderAPI(DecisionRulesOptions options, String targetNodeId, Object data,
+    public FolderImport importFolderAPI(DecisionRulesOptions options, String targetNodeId, Object data,
             FolderOptions folderOptions) throws Exception {
         try {
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
-            URI url = getCategoryUrl(options.host, MngCategoryEnum.RULE, new String[] { "import", targetNodeId },
-                    mapper.convertValue(folderOptions, Map.class));
+            URI url = getCategoryUrl(options.host, MngCategoryEnum.FOLDER, new String[] { "import", targetNodeId },
+                    createDataMap(folderOptions));
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.POST, data);
-            return response;
+            return mapper.readValue(response, FolderImport.class);
         } catch (Exception e) {
             throw e;
         }
     }
 
-    public String getNodeFolderStructureAPI(DecisionRulesOptions options, String targetNodeId,
+    public FolderData getFolderStructureAPI(DecisionRulesOptions options, String targetNodeId,
             FolderOptions folderOptions)
             throws Exception {
         try {
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
-            URI url = getCategoryUrl(options.host, MngCategoryEnum.RULE, new String[] { targetNodeId },
-                    mapper.convertValue(folderOptions, Map.class));
+            URI url = getCategoryUrl(options.host, MngCategoryEnum.FOLDER, new String[] { targetNodeId },
+                    createDataMap(folderOptions));
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.GET);
-            return response;
+            return mapper.readValue(response, FolderData.class);
         } catch (Exception e) {
             throw e;
         }
@@ -334,10 +344,10 @@ public class ManagementApi {
     public String deleteFolderAPI(DecisionRulesOptions options, String targetNodeId, Boolean deleteAll,
             FolderOptions folderOptions) throws Exception {
         try {
-            var folderOptionsMap = mapper.convertValue(folderOptions, Map.class);
+            Map<String, String> folderOptionsMap = new java.util.HashMap<>(createDataMap(folderOptions));
             folderOptionsMap.put("deleteAll", deleteAll.toString());
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
-            URI url = getCategoryUrl(options.host, MngCategoryEnum.RULE, new String[] { targetNodeId },
+            URI url = getCategoryUrl(options.host, MngCategoryEnum.FOLDER, new String[] { targetNodeId },
                     folderOptionsMap);
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.DELETE);
             return response;
@@ -351,7 +361,7 @@ public class ManagementApi {
         try {
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
             URI url = getCategoryUrl(options.host, MngCategoryEnum.FOLDER, new String[] { "rename", targetNodeId },
-                    mapper.convertValue(folderOptions, Map.class));
+                    createDataMap(folderOptions));
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.PATCH, Map.of("name", name));
             return response;
         } catch (Exception e) {
@@ -373,25 +383,27 @@ public class ManagementApi {
         }
     }
 
-    public String findFolderOrRuleByAttributeAPI(DecisionRulesOptions options, String ruleIdOrAlias, Number version)
+    public String findFolderOrRuleByAttributeAPI(DecisionRulesOptions options, FindOptions findOptions)
             throws Exception {
         try {
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
             URI url = getCategoryUrl(options.host, MngCategoryEnum.FOLDER, new String[] { "find" });
-            String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.POST);
+            String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.POST,
+                    findOptions);
             return response;
         } catch (Exception e) {
             throw e;
         }
     }
 
-    String getRuleVersion(Number version, RuleOptions ruleOptions) {
+    String getRuleVersion(Integer version, RuleOptions ruleOptions) {
         if (ruleOptions != null && ruleOptions.version != null) {
             return "";
         }
-        return version != null ? (version == null) ? "" : version.toString() : "";
+        return version != null ? Integer.toString(version) : "";
     }
 
+    @SuppressWarnings("unchecked")
     Map<String, String> createDataMap(Object data) {
         if (data != null) {
             return mapper.convertValue(data, Map.class);

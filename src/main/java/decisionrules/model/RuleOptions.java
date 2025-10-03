@@ -1,10 +1,10 @@
-package cz.epptec.decision.model;
+package decisionrules.model;
 
 public class RuleOptions {
     public String path;
-    public Number version;
+    public Integer version;
 
-    public RuleOptions(String path, Number version) {
+    public RuleOptions(String path, Integer version) {
         this.path = path;
         this.version = version;
     }

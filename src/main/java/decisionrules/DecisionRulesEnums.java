@@ -1,4 +1,4 @@
-package cz.epptec.decision;
+package decisionrules;
 
 public class DecisionRulesEnums {
     public enum HostEnum {

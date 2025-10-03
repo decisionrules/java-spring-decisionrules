@@ -1,6 +1,6 @@
-package cz.epptec.decision;
+package decisionrules;
 
-import cz.epptec.decision.DecisionRulesEnums.HostEnum;
+import decisionrules.DecisionRulesEnums.HostEnum;
 
 public class DecisionRulesOptions {
     public String host;

@@ -1,4 +1,4 @@
-package cz.epptec.decision.exceptions;
+package decisionrules.exceptions;
 
 public class DecisionRulesErrorException extends RuntimeException {
     public String cause;

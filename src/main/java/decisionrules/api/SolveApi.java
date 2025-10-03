@@ -1,6 +1,4 @@
-package cz.epptec.decision.api;
-
-import static cz.epptec.decision.utils.Utils.getBaseURL;
+package decisionrules.api;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -9,17 +7,21 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import cz.epptec.decision.DecisionRulesOptions;
-import cz.epptec.decision.model.SolverOptions;
-import cz.epptec.decision.utils.Utils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import decisionrules.DecisionRulesOptions;
+import decisionrules.model.SolverOptions;
+import static decisionrules.utils.Utils.getBaseURL;
 
 public class SolveApi {
     private final RestTemplate restTemplate;
     private final DecisionRulesOptions options; // change to private
+    private final ObjectMapper mapper;
 
-    public SolveApi(RestTemplate restTemplate, DecisionRulesOptions options) {
+    public SolveApi(RestTemplate restTemplate, DecisionRulesOptions options, ObjectMapper mapper) {
         this.restTemplate = restTemplate;
         this.options = options;
+        this.mapper = mapper;
     }
 
     public HttpHeaders createHeaders(String key, SolverOptions solverOptions) {
@@ -49,10 +51,10 @@ public class SolveApi {
         }
     }
 
-    public String solveAPI(final String ruleId, final String paramsAsJsonInString, final String version) {
+    public String solveAPI(final String ruleId, final Object data, final String version) {
         try {
             HttpEntity<String> entity = new HttpEntity<>(
-                    String.format("{ \"data\":  %s}", paramsAsJsonInString),
+                    String.format("{ \"data\":  %s}", mapper.writeValueAsString(data)),
                     createHeaders(
                             options.solverKey,
                             new SolverOptions(
