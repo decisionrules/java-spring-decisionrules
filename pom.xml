@@ -5,7 +5,21 @@
 
     <groupId>decisionrules</groupId>
     <artifactId>decisionrules-SDK</artifactId>
+    <name>decisionrules-SDK</name>
+    <url>https://github.com/decisionrules/java-spring-decisionrules</url>
     <version>1.0.0</version>
+    <packaging>jar</packaging>
+    
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <description>A Decisionrules.io library that allows you to integrate the DecisionRules Solver, Management, and Job APIs into your Java application as easily as possible.
+
+    </description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
