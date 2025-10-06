@@ -3,13 +3,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>decisionrules</groupId>
+    <groupId>io.decisionrules</groupId>
     <artifactId>decisionrules-SDK</artifactId>
     <name>decisionrules-SDK</name>
     <url>https://github.com/decisionrules/java-spring-decisionrules</url>
     <version>1.0.0</version>
     <packaging>jar</packaging>
-    
+
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
