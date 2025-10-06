@@ -1,16 +1,3 @@
-Of course. Based on the new `DecisionRulesService.java` file, I have updated the `README.md`.
-
-The main changes include:
-
-  * The top-level `solve` method is now documented.
-  * The `management` API section now includes `findDuplicates`, `findDependencies`, and methods for managing tags.
-  * All method signatures, parameters, and return types have been updated to match the provided Java code.
-
-Here is the updated content for your `README.md` file.
-
------
-
-````markdown
 # DecisionRules for Java
 
 ![Jest CI](https://github.com/decisionrules/decisionrules/actions/workflows/main.yml/badge.svg)
