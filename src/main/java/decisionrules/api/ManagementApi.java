@@ -119,7 +119,6 @@ public class ManagementApi {
             URI url = getCategoryUrl(options.host, MngCategoryEnum.RULE,
                     new String[] { "status", ruleIdOrAlias, status.value,
                             versionString });
-            System.err.println("URL: " + url);
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.PUT);
             return mapper.readValue(response, Rule.class);
         } catch (Exception e) {
@@ -134,7 +133,6 @@ public class ManagementApi {
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
             URI url = getCategoryUrl(options.host, MngCategoryEnum.RULE,
                     new String[] { ruleIdOrAlias, versionString });
-            System.err.println("URL: " + url);
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.PUT, data);
             return mapper.readValue(response, Rule.class);
         } catch (Exception e) {
@@ -185,7 +183,6 @@ public class ManagementApi {
             RuleOptions ruleOptions) throws Exception {
         try {
             String versionString = getRuleVersion(version, ruleOptions);
-            System.err.println("Version string: " + versionString);
             HttpHeaders headers = Utils.createHeaders(options.managementKey);
             URI url = getCategoryUrl(options.host, MngCategoryEnum.RULE,
                     new String[] { "lock", ruleIdOrAlias, versionString }, createDataMap(ruleOptions));

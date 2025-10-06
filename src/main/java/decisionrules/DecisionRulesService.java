@@ -1,6 +1,6 @@
 package decisionrules;
 
-import org.apache.http.impl.client.HttpClients;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,6 +26,7 @@ import decisionrules.utils.Utils;
 public class DecisionRulesService {
 
     public final Management management = new Management();
+    public final Job job = new Job();
 
     private final RestTemplate restTemplate;
     private final DecisionRulesOptions options;
@@ -422,41 +423,39 @@ public class DecisionRulesService {
                 throw Utils.handleError(e);
             }
         }
+    }
 
-        public class Job {
-            public decisionrules.model.Job startJob(String ruleIdOrAlias, Object inputData, Integer version) {
-                try {
-                    return jobApi.startJobAPI(options, ruleIdOrAlias, inputData, version);
-                } catch (Exception e) {
-                    throw Utils.handleError(e);
-                }
-            }
-
-            public decisionrules.model.Job startJob(String ruleIdOrAlias, Object inputData) {
-                try {
-                    return jobApi.startJobAPI(options, ruleIdOrAlias, inputData, null);
-                } catch (Exception e) {
-                    throw Utils.handleError(e);
-                }
-            }
-
-            public decisionrules.model.Job cancelJob(String jobId) {
-                try {
-                    return jobApi.cancelJobAPI(options, jobId);
-                } catch (Exception e) {
-                    throw Utils.handleError(e);
-                }
-            }
-
-            public decisionrules.model.Job jobInfo(String jobId) {
-                try {
-                    return jobApi.jobInfoAPI(options, jobId);
-                } catch (Exception e) {
-                    throw Utils.handleError(e);
-                }
+    public class Job {
+        public decisionrules.model.Job start(String ruleIdOrAlias, Object inputData, Integer version) {
+            try {
+                return jobApi.startJobAPI(options, ruleIdOrAlias, inputData, version);
+            } catch (Exception e) {
+                throw Utils.handleError(e);
             }
         }
 
-    }
+        public decisionrules.model.Job start(String ruleIdOrAlias, Object inputData) {
+            try {
+                return jobApi.startJobAPI(options, ruleIdOrAlias, inputData, null);
+            } catch (Exception e) {
+                throw Utils.handleError(e);
+            }
+        }
 
+        public decisionrules.model.Job cancel(String jobId) {
+            try {
+                return jobApi.cancelJobAPI(options, jobId);
+            } catch (Exception e) {
+                throw Utils.handleError(e);
+            }
+        }
+
+        public decisionrules.model.Job info(String jobId) {
+            try {
+                return jobApi.jobInfoAPI(options, jobId);
+            } catch (Exception e) {
+                throw Utils.handleError(e);
+            }
+        }
+    }
 }

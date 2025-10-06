@@ -3,20 +3,20 @@ package decisionrules.model;
 import java.util.Map;
 
 public class Job {
-    private RuleReference ruleReference;
-    private Map<String, Object> inputData;
-    private String jobId;
-    private Context context;
-    private Status status;
-    private String correlationId;
-    private String createdAt;
-    private String updatedAt;
+    public RuleReference ruleReference;
+    public Map<String, Object> inputData;
+    public String jobId;
+    public Context context;
+    public Status status;
+    public String correlationId;
+    public String createdAt;
+    public String updatedAt;
 
     // Nested classes
     public static class RuleReference {
-        private String baseId;
-        private int version;
-        private String type;
+        public String baseId;
+        public int version;
+        public String type;
 
         // Getters and Setters
         public String getBaseId() {

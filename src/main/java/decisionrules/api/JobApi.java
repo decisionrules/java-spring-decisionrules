@@ -28,7 +28,8 @@ public class JobApi {
         try {
             String baseUrl = getBaseURL(host);
             String path = String.format("/job/%s", String.join("/",
-                    Arrays.stream(apiPath).filter(pathParam -> !pathParam.isEmpty()).toArray(String[]::new)));
+                    Arrays.stream(apiPath).filter(pathParam -> pathParam != null && !pathParam.isEmpty())
+                            .toArray(String[]::new)));
             return URI.create(baseUrl + path);
         } catch (Exception e) {
             throw new Exception(e);
@@ -62,7 +63,7 @@ public class JobApi {
     public Job jobInfoAPI(DecisionRulesOptions options, String jobId) throws Exception {
         try {
             HttpHeaders headers = Utils.createHeaders(options.solverKey);
-            URI url = getCategoryUrl(options.host, new String[] { "info", jobId });
+            URI url = getCategoryUrl(options.host, new String[] { jobId });
             String response = Utils.doCall(this.restTemplate, url, headers, HttpMethod.GET);
             return mapper.readValue(response, Job.class);
         } catch (Exception e) {
