@@ -1,5 +1,11 @@
 package decisionrules;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.apache.hc.client5.http.impl.classic.HttpClients;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
@@ -457,5 +463,33 @@ public class DecisionRulesService {
                 throw Utils.handleError(e);
             }
         }
+    }
+
+    public boolean validateWebhookSignature(String payload, String signature, String secret) {
+        try {
+            // Create HMAC-SHA256 key
+            Mac hmac = Mac.getInstance("HmacSHA256");
+            SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+            hmac.init(secretKey);
+
+            // Compute HMAC digest
+            byte[] hash = hmac.doFinal(payload.getBytes(StandardCharsets.UTF_8));
+            String expectedSignature = bytesToHex(hash);
+
+            // Timing-safe comparison
+            return MessageDigest.isEqual(signature.getBytes(StandardCharsets.UTF_8),
+                    expectedSignature.getBytes(StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            throw Utils.handleError(e);
+        }
+    }
+
+    // Helper to convert byte array to hex string
+    private String bytesToHex(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (byte b : bytes) {
+            sb.append(String.format("%02x", b));
+        }
+        return sb.toString();
     }
 }
