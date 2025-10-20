@@ -39,10 +39,10 @@ public class SolveApi {
         }
     }
 
-    private String createUrl(DecisionRulesOptions options, String ruleId, String version) throws Exception {
+    private String createUrl(DecisionRulesOptions options, String ruleId, Integer version) throws Exception {
         String url = String.format("/rule/solve/%s", ruleId);
-        if (version != null) {
-            url += version;
+        if (version != null && version > 0) {
+            url += String.valueOf(version);
         }
         try {
             return getBaseURL(options.host) + url;
@@ -51,17 +51,21 @@ public class SolveApi {
         }
     }
 
-    public String solveAPI(final String ruleId, final Object data, final String version) {
+    public String solveAPI(final String ruleId, final Object data, final Integer version,
+            final SolverOptions solverOptions) {
         try {
             HttpEntity<String> entity = new HttpEntity<>(
-                    String.format("{ \"data\":  %s}", mapper.writeValueAsString(data)),
+                    String.format(
+                            "{ \"data\":  %s}",
+                            data instanceof String ? data : mapper.writeValueAsString(data)),
                     createHeaders(
                             options.solverKey,
-                            new SolverOptions(
-                                    false,
-                                    null,
-                                    false,
-                                    null)));
+                            solverOptions != null ? solverOptions
+                                    : new SolverOptions(
+                                            false,
+                                            null,
+                                            false,
+                                            null)));
             ResponseEntity<String> response = restTemplate.exchange(
                     java.net.URI.create(createUrl(options, ruleId, version)), HttpMethod.POST, entity, String.class);
             return response.getBody();
