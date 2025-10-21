@@ -27,6 +27,7 @@ import decisionrules.model.FolderNode;
 import decisionrules.model.FolderOptions;
 import decisionrules.model.Rule;
 import decisionrules.model.RuleOptions;
+import decisionrules.model.SolverOptions;
 import decisionrules.utils.Utils;
 
 public class DecisionRulesService {
@@ -59,7 +60,32 @@ public class DecisionRulesService {
      *         user
      */
     public String solve(final String ruleIdOrAlias, final Object input) {
-        return solveApi.solveAPI(ruleIdOrAlias, input, "");
+        return solveApi.solveAPI(ruleIdOrAlias, input, -1, null);
+    }
+
+    /**
+     * @param ruleIdOrAlias
+     * @param input         - can be any object, it will be serialized to JSON, if
+     *                      string is passed it will be used as is
+     * @param version       version of a rule
+     * @return JSON string response from the API - further processing is up to the
+     *         user
+     */
+    public String solve(final String ruleIdOrAlias, final Object input, Integer version) {
+        return solveApi.solveAPI(ruleIdOrAlias, input, version, null);
+    }
+
+    /**
+     * @param ruleIdOrAlias
+     * @param input         - can be any object, it will be serialized to JSON, if
+     *                      string is passed it will be used as is
+     * @param version       version of a rule
+     * @param solverOptions options of solver
+     * @return JSON string response from the API - further processing is up to the
+     *         user
+     */
+    public String solve(final String ruleIdOrAlias, final Object input, Integer version, SolverOptions solverOptions) {
+        return solveApi.solveAPI(ruleIdOrAlias, input, version, solverOptions);
     }
 
     public class Management {
