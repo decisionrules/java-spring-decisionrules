@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,6 +22,7 @@ import decisionrules.model.Rule;
 
 public class IntegrationTest {
         @Test
+        @Disabled("Run only when ENV variables are set")
         public void testFullWorkflow() throws InterruptedException, JsonProcessingException {
                 // Build rule
                 ObjectMapper mapper = new ObjectMapper();
