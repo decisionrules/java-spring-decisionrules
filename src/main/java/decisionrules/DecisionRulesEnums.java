@@ -45,4 +45,11 @@ public class DecisionRulesEnums {
             this.value = value;
         }
     }
+
+    public enum StrategyOptions {
+        STANDARD,
+        ARRAY,
+        FIRST_MATCH,
+        EVALUATE_ALL
+    }
 }

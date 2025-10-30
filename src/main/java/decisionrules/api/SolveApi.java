@@ -33,6 +33,19 @@ public class SolveApi {
             }
             headers.set("Authorization", "Bearer " + key);
 
+            headers.set("X-Debug", solverOptions.getDebug().toString());
+
+            if (solverOptions.getCorrId() != null) {
+                headers.set("X-Correlation-Id", solverOptions.getCorrId());
+            }
+            headers.set("X-Strategy",
+                    solverOptions.getStrategy() != null ? solverOptions.getStrategy().toString() : "STANDARD");
+
+            headers.set("X-Audit", solverOptions.getAudit() != null ? solverOptions.getAudit().toString() : "false");
+
+            if (solverOptions.getAuditTtl() != null) {
+                headers.set("X-Audit-Ttl", solverOptions.getAuditTtl().toString());
+            }
             return headers;
         } catch (Exception e) {
             throw e;
@@ -56,16 +69,13 @@ public class SolveApi {
         try {
             HttpEntity<String> entity = new HttpEntity<>(
                     String.format(
-                            "{ \"data\":  %s}",
-                            data instanceof String ? data : mapper.writeValueAsString(data)),
+                            "{ \"data\":  %s, \"options\":  %s}",
+                            data instanceof String ? data : mapper.writeValueAsString(data),
+                            solverOptions != null ? mapper.writeValueAsString(solverOptions.getCols()) : ""),
                     createHeaders(
                             options.solverKey,
                             solverOptions != null ? solverOptions
-                                    : new SolverOptions(
-                                            false,
-                                            null,
-                                            false,
-                                            null)));
+                                    : new SolverOptions.Builder().build()));
             ResponseEntity<String> response = restTemplate.exchange(
                     java.net.URI.create(createUrl(options, ruleId, version)), HttpMethod.POST, entity, String.class);
             return response.getBody();
