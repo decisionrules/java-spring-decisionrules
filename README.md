@@ -21,7 +21,7 @@ Add the following dependency to your `pom.xml`:
 ```xml
 <dependency>
     <groupId>io.decisionrules</groupId>
-    <artifactId>decisionrules-java</artifactId>
+    <artifactId>decisionrules</artifactId>
     <version>LATEST</version>
 </dependency>
 ````
