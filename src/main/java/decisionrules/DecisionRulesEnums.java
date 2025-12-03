@@ -52,4 +52,9 @@ public class DecisionRulesEnums {
         FIRST_MATCH,
         EVALUATE_ALL
     }
+
+    public enum LookupMethodOptions {
+        LOOKUP_VALUE,
+        LOOKUP_EXISTS
+    }
 }

@@ -2,6 +2,7 @@ package decisionrules.model;
 
 import java.util.List;
 
+import decisionrules.DecisionRulesEnums.LookupMethodOptions;
 import decisionrules.DecisionRulesEnums.StrategyOptions;
 
 public class SolverOptions {
@@ -12,6 +13,7 @@ public class SolverOptions {
     private String aliasConflictPath;
     private StrategyOptions strategy;
     private ColsOptions cols;
+    private LookupMethodOptions lookupMethod;
 
     // Default constructor (for deserialization)
     public SolverOptions() {
@@ -19,13 +21,14 @@ public class SolverOptions {
 
     // Full constructor
     public SolverOptions(Boolean debug, String corrId, Boolean audit, Integer auditTtl,
-            String aliasConflictPath, StrategyOptions strategy, ColsOptions cols) {
+            String aliasConflictPath, StrategyOptions strategy,LookupMethodOptions lookupMethod, ColsOptions cols) {
         this.debug = debug;
         this.corrId = corrId;
         this.audit = audit;
         this.auditTtl = auditTtl;
         this.aliasConflictPath = aliasConflictPath;
         this.strategy = strategy;
+        this.lookupMethod = lookupMethod;
         this.cols = cols;
     }
 
@@ -58,6 +61,10 @@ public class SolverOptions {
         return cols;
     }
 
+    public LookupMethodOptions getLookupMethod() {
+        return lookupMethod;
+    }
+
     // Builder Pattern
     public static class Builder {
         private Boolean debug;
@@ -66,6 +73,7 @@ public class SolverOptions {
         private Integer auditTtl;
         private String aliasConflictPath;
         private StrategyOptions strategy;
+        private LookupMethodOptions lookupMethod;
         private ColsOptions cols;
 
         public Builder debug(Boolean debug) {
@@ -98,13 +106,18 @@ public class SolverOptions {
             return this;
         }
 
+        public Builder lookupMethod(LookupMethodOptions lookupMethod) {
+            this.lookupMethod = lookupMethod;
+            return this;
+        }
+
         public Builder cols(ColsOptions cols) {
             this.cols = cols;
             return this;
         }
 
         public SolverOptions build() {
-            return new SolverOptions(debug, corrId, audit, auditTtl, aliasConflictPath, strategy, cols);
+            return new SolverOptions(debug, corrId, audit, auditTtl, aliasConflictPath, strategy, lookupMethod, cols);
         }
     }
 
