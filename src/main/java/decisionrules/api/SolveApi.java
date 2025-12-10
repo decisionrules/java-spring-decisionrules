@@ -33,13 +33,23 @@ public class SolveApi {
             }
             headers.set("Authorization", "Bearer " + key);
 
-            headers.set("X-Debug", solverOptions.getDebug().toString());
+            if (solverOptions.getDebug() != null) {
+                headers.set("X-Debug", solverOptions.getDebug().toString());
+            }
 
             if (solverOptions.getCorrId() != null) {
                 headers.set("X-Correlation-Id", solverOptions.getCorrId());
             }
-            headers.set("X-Strategy",
-                    solverOptions.getStrategy() != null ? solverOptions.getStrategy().toString() : "STANDARD");
+
+            if (solverOptions.getStrategy() != null) {
+                headers.set("X-Strategy", solverOptions.getStrategy().toString());
+            } else {
+                headers.set("X-Strategy", "STANDARD");
+            }
+
+            if (solverOptions.getLookupMethod() != null) {
+                headers.set("X-Lookup-Method", solverOptions.getLookupMethod().toString());
+            }
 
             headers.set("X-Audit", solverOptions.getAudit() != null ? solverOptions.getAudit().toString() : "false");
 
@@ -55,6 +65,7 @@ public class SolveApi {
     private String createUrl(DecisionRulesOptions options, String ruleId, Integer version) throws Exception {
         String url = String.format("/rule/solve/%s", ruleId);
         if (version != null && version > 0) {
+            url += "/";
             url += String.valueOf(version);
         }
         try {
@@ -69,9 +80,8 @@ public class SolveApi {
         try {
             HttpEntity<String> entity = new HttpEntity<>(
                     String.format(
-                            "{ \"data\":  %s, \"options\":  %s}",
-                            data instanceof String ? data : mapper.writeValueAsString(data),
-                            solverOptions != null ? mapper.writeValueAsString(solverOptions.getCols()) : ""),
+                            "{ \"data\":  %s }",
+                            data instanceof String ? data : mapper.writeValueAsString(data)),
                     createHeaders(
                             options.solverKey,
                             solverOptions != null ? solverOptions

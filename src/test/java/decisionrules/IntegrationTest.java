@@ -12,13 +12,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import decisionrules.DecisionRulesEnums.FolderType;
+import decisionrules.DecisionRulesEnums.LookupMethodOptions;
 import decisionrules.DecisionRulesEnums.RuleStatus;
+import decisionrules.DecisionRulesEnums.StrategyOptions;
 import decisionrules.model.FindOptions;
 import decisionrules.model.FolderData;
 import decisionrules.model.FolderExport;
 import decisionrules.model.FolderNode;
 import decisionrules.model.Job;
 import decisionrules.model.Rule;
+import decisionrules.model.SolverOptions;
 
 public class IntegrationTest {
         @Test
@@ -29,40 +32,28 @@ public class IntegrationTest {
                 mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
                 Rule rule = new Rule.Builder()
-                                .setName("Integration Flow v2")
+                                .setName("Integration Flow")
                                 .setDescription("")
                                 .setType("integration-flow")
                                 .setStatus("published")
+                                .setRuleAlias("bizarre-jay")
+                                .setTags(List.of())
+                                // 1. Template Metadata
+                                .setTemplateMetadata(Map.of())
+
+                                // 2. Input/Output Schemas
                                 .setInputSchema(Map.of("input", Map.of()))
                                 .setOutputSchema(Map.of("output", Map.of()))
-                                .setTags(List.of())
-                                .setAuditLog(Map.of("active", false, "debug", Map.of("active", false), "ttl",
-                                                14))
-                                .setVisualEditorData(Map.of(
-                                                "scale", 1,
-                                                "rotate", 0,
-                                                "translate", Map.of("x", -67, "y", -1)))
-                                .setSelectedWebhookAliases(List.of("wh-E5d6EU8B"))
+
+                                // 3. Workflow Data (The heavy lifting)
                                 .setWorkflowData(Map.of(
                                                 "nodes", List.of(
+                                                                // Node 1: START
                                                                 Map.of(
-                                                                                "connectors", List.of(
-                                                                                                Map.of(
-                                                                                                                "type",
-                                                                                                                "out",
-                                                                                                                "maxConnections",
-                                                                                                                -1,
-                                                                                                                "subType",
-                                                                                                                "none",
-                                                                                                                "maxCount",
-                                                                                                                1,
-                                                                                                                "minCount",
-                                                                                                                1)),
                                                                                 "id", "c2c8e47c",
                                                                                 "version", 1,
                                                                                 "type", "START",
-                                                                                "position", Map.of("x", 167, "y", 325)),
-                                                                Map.of(
+                                                                                "position", Map.of("x", 167, "y", 325),
                                                                                 "connectors", List.of(
                                                                                                 Map.of(
                                                                                                                 "type",
@@ -71,6 +62,29 @@ public class IntegrationTest {
                                                                                                                 -1,
                                                                                                                 "subType",
                                                                                                                 "none",
+                                                                                                                "id",
+                                                                                                                "fbd5a179-588e-4e75-b1e3-73ef458a84a2",
+                                                                                                                "maxCount",
+                                                                                                                1,
+                                                                                                                "minCount",
+                                                                                                                1))),
+                                                                // Node 2: DATA_MANIPULATION (Assign)
+                                                                Map.of(
+                                                                                "id", "ea510873",
+                                                                                "version", 1,
+                                                                                "type", "DATA_MANIPULATION",
+                                                                                "name", "assign",
+                                                                                "position", Map.of("x", 582, "y", 263),
+                                                                                "connectors", List.of(
+                                                                                                Map.of(
+                                                                                                                "type",
+                                                                                                                "out",
+                                                                                                                "maxConnections",
+                                                                                                                -1,
+                                                                                                                "subType",
+                                                                                                                "none",
+                                                                                                                "id",
+                                                                                                                "db64b725-6474-4cd9-affc-523c34c00233",
                                                                                                                 "maxCount",
                                                                                                                 1,
                                                                                                                 "minCount",
@@ -82,18 +96,20 @@ public class IntegrationTest {
                                                                                                                 -1,
                                                                                                                 "subType",
                                                                                                                 "none",
+                                                                                                                "id",
+                                                                                                                "7d0c5894-4981-4cc4-ae32-bb4b9dde5995",
                                                                                                                 "maxCount",
                                                                                                                 1,
                                                                                                                 "minCount",
                                                                                                                 1)),
-                                                                                "id", "63e3801f",
-                                                                                "version", 1,
-                                                                                "type", "DATA_MANIPULATION",
-                                                                                "position", Map.of("x", 535, "y", 285),
-                                                                                "name", "assign",
                                                                                 "data", Map.of(
+                                                                                                "guiSettings",
+                                                                                                Map.of("showAll",
+                                                                                                                false),
                                                                                                 "mapping", List.of(
                                                                                                                 Map.of(
+                                                                                                                                "target",
+                                                                                                                                Map.of("path", "output.output"),
                                                                                                                                 "source",
                                                                                                                                 Map.of(
                                                                                                                                                 "expression",
@@ -105,16 +121,110 @@ public class IntegrationTest {
                                                                                                                                                                                 "type",
                                                                                                                                                                                 "function",
                                                                                                                                                                                 "value",
-                                                                                                                                                                                "Job will be run",
+                                                                                                                                                                                "Hello",
                                                                                                                                                                                 "stringValue",
-                                                                                                                                                                                "Job will be run"))),
-                                                                                                                                "target",
-                                                                                                                                Map.of("path", "output.output"))),
-                                                                                                "guiSettings",
-                                                                                                Map.of("showAll",
-                                                                                                                false)))),
+                                                                                                                                                                                "Hello")))))))),
                                                 "connections", List.of(
-                                                                Map.of("type", 0))))
+                                                                Map.of(
+                                                                                "source",
+                                                                                "fbd5a179-588e-4e75-b1e3-73ef458a84a2",
+                                                                                "target",
+                                                                                "7d0c5894-4981-4cc4-ae32-bb4b9dde5995",
+                                                                                "type", 0,
+                                                                                "id",
+                                                                                "b9693373-bb0b-40b5-ab6b-a8c4420066bd"))))
+
+                                // 4. Visual Data
+                                .setVisualData(Map.of(
+                                                "scale", 1,
+                                                "rotate", 0,
+                                                "translate", Map.of("x", -67, "y", -18)))
+
+                                // 5. Audit Log
+                                .setAuditLog(Map.of(
+                                                "active", false,
+                                                "ttl", 14,
+                                                "debug", Map.of("active", false)))
+
+                                // 6. Dates (Using current date for simplicity)
+                                .setCreatedIn(new java.util.Date())
+                                .setLastUpdate(new java.util.Date())
+                                .build();
+
+                Rule lookupTableRule = new Rule.Builder()
+                                .setName("Testing table 2")
+                                .setDescription("")
+                                .setType("lookup-table")
+                                .setInputSchema(Map.of(
+                                                "primaryKey", Map.of(),
+                                                "outputColumn", Map.of(),
+                                                "method", Map.of()))
+                                .setOutputSchema(Map.of(
+                                                "output", Map.of()))
+                                .setTags(List.of())
+                                .setStatus("published")
+                                .setVersion(4)
+                                .setAuditLog(Map.of(
+                                                "active", false,
+                                                "debug", Map.of("active", false),
+                                                "ttl", 14))
+                                .setVisualEditorData(Map.of(
+                                                "columns", List.of(
+                                                                Map.of(
+                                                                                "name", "Primary Key",
+                                                                                "alias", "pk",
+                                                                                "order", 0,
+                                                                                "isPrimaryKey", true),
+                                                                Map.of(
+                                                                                "name", "id",
+                                                                                "alias", "03EOXNMB")),
+                                                "primaryKeyColumn", "pk",
+                                                "data", Map.of(
+                                                                "Orange",
+                                                                Map.of("pk", "Orange", "03EOXNMB", "1", "_position", 0),
+                                                                "Door hinge",
+                                                                Map.of("pk", "Door hinge", "03EOXNMB", "2", "_position",
+                                                                                1),
+                                                                "Porridge",
+                                                                Map.of("pk", "Porridge", "03EOXNMB", "3", "_position",
+                                                                                2),
+                                                                "Four inch",
+                                                                Map.of("pk", "Four inch", "03EOXNMB", "4", "_position",
+                                                                                3),
+                                                                "Forage",
+                                                                Map.of("pk", "Forage", "03EOXNMB", "5", "_position", 4),
+                                                                "Storage",
+                                                                Map.of("pk", "Storage", "03EOXNMB", "6", "_position",
+                                                                                5)),
+                                                "sourceData", List.of(
+                                                                Map.of("pk", "Orange", "03EOXNMB", "1", "_position", 0),
+                                                                Map.of("pk", "Door hinge", "03EOXNMB", "2", "_position",
+                                                                                1),
+                                                                Map.of("pk", "Porridge", "03EOXNMB", "3", "_position",
+                                                                                2),
+                                                                Map.of("pk", "Four inch", "03EOXNMB", "4", "_position",
+                                                                                3),
+                                                                Map.of("pk", "Forage", "03EOXNMB", "5", "_position", 4),
+                                                                Map.of("pk", "Storage", "03EOXNMB", "6", "_position",
+                                                                                5))))
+                                .setColumns(List.of(
+                                                Map.of(
+                                                                "name", "Primary Key",
+                                                                "alias", "pk",
+                                                                "order", 0,
+                                                                "isPrimaryKey", true),
+                                                Map.of(
+                                                                "name", "id",
+                                                                "alias", "03EOXNMB")))
+                                .setPrimaryKeyColumn("pk")
+                                .setData(Map.of(
+                                                "Orange", Map.of("pk", "Orange", "03EOXNMB", "1", "_position", 0),
+                                                "Door hinge",
+                                                Map.of("pk", "Door hinge", "03EOXNMB", "2", "_position", 1),
+                                                "Porridge", Map.of("pk", "Porridge", "03EOXNMB", "3", "_position", 2),
+                                                "Four inch", Map.of("pk", "Four inch", "03EOXNMB", "4", "_position", 3),
+                                                "Forage", Map.of("pk", "Forage", "03EOXNMB", "5", "_position", 4),
+                                                "Storage", Map.of("pk", "Storage", "03EOXNMB", "6", "_position", 5)))
                                 .build();
 
                 String host = System.getenv("HOST");
@@ -139,10 +249,28 @@ public class IntegrationTest {
                 folder = dr.management.getFolderStructure("root").children.stream()
                                 .filter(f -> f.name.equals("Folder Name")).findFirst().orElse(null);
                 Rule createdRule = dr.management.createRule(rule, "/Folder Name");
+                Rule createdlookupTableRule = dr.management.createRule(lookupTableRule, "/Folder Name");
+                String requestBody = "{\"primaryKey\":\"Four inch\",\"outputColumn\":{},\"method\":{}}";
+                dr.solve(
+                                createdlookupTableRule.baseId,
+                                requestBody,
+                                createdlookupTableRule.version,
+                                new SolverOptions.Builder()
+                                                .lookupMethod(LookupMethodOptions.LOOKUP_EXISTS)
+                                                .build());
+                dr.solve(
+                                createdlookupTableRule.baseId,
+                                requestBody,
+                                createdlookupTableRule.version,
+                                new SolverOptions.Builder()
+                                                .lookupMethod(LookupMethodOptions.LOOKUP_VALUE)
+                                                .build());
+                dr.solve(
+                                createdlookupTableRule.baseId,
+                                requestBody);
                 createdRule.description = "Updated description";
                 dr.management.getRuleByPath("/Folder Name/" + rule.name);
                 Job job = dr.job.start(createdRule.ruleId, Map.of("input", Map.of()));
-                Thread.sleep(2000);
                 dr.job.info(job.jobId);
                 dr.job.cancel(job.jobId);
                 dr.management.updateRule(createdRule.ruleId, createdRule);
@@ -165,14 +293,14 @@ public class IntegrationTest {
                 dr.management.renameFolder(folder.id, "New Name");
                 dr.management.importFolder("root", folderExport);
                 FolderData folder2 = dr.management.getFolderStructure().children.stream()
-                                .filter(f -> f.name.equals("Folder Name")).findFirst().orElse(null);
+                .filter(f -> f.name.equals("Folder Name")).findFirst().orElse(null);
                 dr.management.getFolderStructure(folder2.id);
                 dr.management.moveFolder(folder.id, new FolderNode[] {
-                                new FolderNode(folder2.id, FolderType.FOLDER)
+                new FolderNode(folder2.id, FolderType.FOLDER)
                 }, "/New Name");
                 dr.management.findFolderOrRuleByAttribute(
-                                new FindOptions(null, null, null, null, null, null, null, FolderType.RULE,
-                                                null));
+                new FindOptions(null, null, null, null, null, null, null, FolderType.RULE,
+                null));
                 dr.management.deleteFolderByPath("/New Name", true);
         }
 };
