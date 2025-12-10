@@ -491,7 +491,7 @@ public class DecisionRulesService {
         }
     }
 
-    public boolean validateWebhookSignature(String payload, String signature, String secret) {
+    public static boolean validateWebhookSignature(String payload, String signature, String secret) {
         try {
             // Create HMAC-SHA256 key
             Mac hmac = Mac.getInstance("HmacSHA256");
@@ -511,7 +511,7 @@ public class DecisionRulesService {
     }
 
     // Helper to convert byte array to hex string
-    private String bytesToHex(byte[] bytes) {
+    private static String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
             sb.append(String.format("%02x", b));
